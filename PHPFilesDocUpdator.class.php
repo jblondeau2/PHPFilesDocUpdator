@@ -88,6 +88,17 @@ class PHPFilesDocUpdator
             {
                 $this->applyChange($f, 'package', $this->options['packageName']);
             }
+            
+            if (empty($this->options['packageName']))
+            {
+                /**
+                 * Check if file is a plugin/bundle/other one (for example symfony/Symfony projects).
+                 */
+                if (preg_match('/(\w*)(Plugin|Bundle)\//', $f['filePath'], $matches))
+                {
+                    $this->applyChange($f, 'package', $matches[1].$matches[2]);
+                }
+            }
 
             if (isset($this->options['withSubPackages']) && $this->options['withSubPackages'])
             {

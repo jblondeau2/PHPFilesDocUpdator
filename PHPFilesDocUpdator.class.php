@@ -184,7 +184,7 @@ class PHPFilesDocUpdator
      * 
      * @return string
      */
-    public function getFileTypeFromPath($filePath)
+    protected function getFileTypeFromPath($filePath)
     {
         $fileExploded = explode('/', $filePath);
 

@@ -3,25 +3,6 @@
 /**
  * PHPFilesDocUpdator class.
  * 
- * -------------------------------------
- * Usage from CLI
- * -------------------------------------
- * 
- * Just parse and display informations:
- *      php packages.php /path/to/parse
- * 
- * To force new package name:
- *      php packages.php /path/to/parse myNewPackageName
- * 
- * To associate file type (model/form/filter/...) to subpackage information:
- *      php packages.php /path/to/parse --subs
- *      php packages.php /path/to/parse myNewPackageName --subs
- * 
- * To use in real mode (with files writing):
- *      php packages.php /path/to/parse --real
- *      php packages.php /path/to/parse myNewPackageName --real
- *      php packages.php /path/to/parse myNewPackageName --subs --real
- * 
  * @package PHPFilesDocUpdator
  * 
  * @author Cédric Dugat <c.dugat@groupe-highco.com>

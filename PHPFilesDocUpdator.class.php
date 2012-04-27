@@ -126,29 +126,53 @@ class PHPFilesDocUpdator
      */
     protected function applyChange(array $file, $key, $value)
     {
-        if (isset($file['phpDoc'][$key]) && $file['phpDoc'][$key])
+        if ($this->options['realMode'])
         {
-            $newLine = str_replace($file['phpDoc'][$key]['value'], $value, $file['phpDoc'][$key]['originalLine']);
-
-            if ($this->options['realMode'])
+            if (count($file['phpDoc']) == 0)
             {
+                $spacesBetweenKeyAndValue = '';
+
+                for ($i = strlen($key); $i <= 12; $i++)
+                {
+                    $spacesBetweenKeyAndValue .= ' ';
+                }
+                $commentsLines  = "/**\n\r";
+                $commentsLines .= "  * @$key$spacesBetweenKeyAndValue$value\n\r";
+                $commentsLines .= "  */\n\r\n\r";
+
+                /**
+                 * @todo Insert file first commented lines.
+                 */
+                exit('ADD PHPDOC');
+            }
+            elseif (isset($file['phpDoc'][$key]) && $file['phpDoc'][$key])
+            {
+                $newLine = str_replace($file['phpDoc'][$key]['value'], $value, $file['phpDoc'][$key]['originalLine']);
+
                 $processResult = $this->replaceLines($file['filePath'], array($file['phpDoc'][$key]['lineNumber'] => $newLine)) ? '[OK]' : '[NOK]';
             }
             else
             {
-                $processResult = '[NOT-REAL-MODE]';
+                /**
+                 * @todo Add a phpDoc property.
+                 */
+                exit('ADD PHPDOC');
             }
-
-            $file['phpDoc'][$key]['value'] = $value;
-
-            $this->changesLogs[] = sprintf('[%s] %s / %s -> %s %s',
-                strtoupper($key),
-                $file['filePath'],
-                $file['phpDoc'][$key]['value'],
-                $value,
-                $processResult
-            );
         }
+        else
+        {
+            $processResult = '[NOT-REAL-MODE]';
+        }
+
+        $file['phpDoc'][$key]['value'] = $value;
+
+        $this->changesLogs[] = sprintf('[%s] %s / %s -> %s %s',
+            strtoupper($key),
+            $file['filePath'],
+            $file['phpDoc'][$key]['value'],
+            $value,
+            $processResult
+        );
     }
 
     /**

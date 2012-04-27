@@ -152,7 +152,7 @@ class PHPFilesDocUpdator
                 $className = explode('.', $className[count($className) - 1]);
                 $className = $className[0];
 
-                if ($file['phpDoc']['package'])
+                if (isset($file['phpDoc']['package']) && isset($file['phpDoc']['package']))
                 {
                     $classDescription = sprintf('%s\'s %s class.', ucfirst($file['phpDoc']['package']), $className);
                 }

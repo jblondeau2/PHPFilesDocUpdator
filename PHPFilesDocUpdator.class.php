@@ -75,8 +75,9 @@ class PHPFilesDocUpdator
     {
         foreach ($this->getFilesFromGlob($this->pathToParse.'/*.class.php') as $k => $filePath)
         {
-            $this->files[] = $this->getFileInformations($filePath);
-            $this->files[$k]['key'] = $k;
+            $this->files[]                                 = $this->getFileInformations($filePath);
+            $this->files[$k]['key']                        = $k;
+            $this->files[$k]['classDeclarationLineNumber'] = $this->getClassDeclarationLineNumber($filePath);
         }
 
         foreach ($this->files as $f)
@@ -171,7 +172,9 @@ class PHPFilesDocUpdator
 
             if ($this->options['realMode'])
             {
-                $processResult = $this->replaceLines($file['filePath'], array(2 => $linesToAdd));
+                $lineToReplaceNumber = $file['classDeclarationLineNumber'] ? ($file['classDeclarationLineNumber'] - 1) : 2;
+
+                $processResult = $this->replaceLines($file['filePath'], array($lineToReplaceNumber => $linesToAdd));
             }
 
             $processType = '*';
@@ -199,11 +202,11 @@ class PHPFilesDocUpdator
             $itemInfos    = $phpDocItems[count($phpDocItems) - 1];
             $lineNumber   = $file['phpDoc'][$itemInfos['key']]['lineNumber'];
             $originalLine = $file['phpDoc'][$itemInfos['key']]['originalLine'];
-            $lineToAdd    = "  * @$key$spacesBetweenKeyAndValue$value";
+            $lineToAdd    = " * @$key$spacesBetweenKeyAndValue$value";
 
             if ($this->options['realMode'])
             {
-                $processResult = $this->replaceLines($file['filePath'], array($lineNumber => $originalLine."\n\r".$lineToAdd));
+                $processResult = $this->replaceLines($file['filePath'], array($lineNumber => $originalLine."\n".$lineToAdd));
             }
 
             $processType = 'CREATED';
@@ -301,7 +304,7 @@ class PHPFilesDocUpdator
      *
      * @return array
      */
-    protected function getParsedLines($filePath, $limitCount = 10)
+    protected function getParsedLines($filePath, $limitCount = 15)
     {
         $fileFirstLines = file($filePath);
         $parsedLines = array();
@@ -316,7 +319,7 @@ class PHPFilesDocUpdator
                  * Only parse first commented lines.
                  * Stop parsing if PHP code starts.
                  */
-                if ($lineToParse && !in_array(substr(trim($lineToParse), 0, 1), array('<', '*', '/')))
+                if ($lineToParse && !in_array(substr(trim($lineToParse), 0, 1), array('<', '*', '/')) && !preg_match('/^require/', trim($lineToParse)))
                 {
                     break;
                 }
@@ -335,6 +338,31 @@ class PHPFilesDocUpdator
         }
 
         return $parsedLines;
+    }
+
+    /**
+     * Get file main class declaration line number.
+     * 
+     * @param string $filePath File path
+     * @param int    $limitCount Lines count limit
+     * 
+     * @return int
+     */
+    protected function getClassDeclarationLineNumber($filePath, $limitCount = 15)
+    {
+        $fileFirstLines = file($filePath);
+
+        for ($i = 0; $i <= $limitCount; $i++)
+        {
+            if (preg_match('/^class/', trim($fileFirstLines[$i])))
+            {
+                return ($i + 1);
+
+                break;
+            }
+        }
+
+        return null;
     }
 
     /**

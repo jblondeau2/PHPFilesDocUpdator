@@ -129,19 +129,19 @@ class PHPFilesDocUpdator
     {
         $file = $this->files[$file['key']];
 
+        $spacesBetweenKeyAndValue = '';
+
+        for ($i = strlen($key); $i <= 12; $i++)
+        {
+            $spacesBetweenKeyAndValue .= ' ';
+        }
+
         if (count($file['phpDoc']) == 0)
         {
-            $spacesBetweenKeyAndValue = '';
-
-            for ($i = strlen($key); $i <= 12; $i++)
-            {
-                $spacesBetweenKeyAndValue .= ' ';
-            }
-
             $linesToAdd  = "\n\r";
             $linesToAdd .= "/**\n\r";
             $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value\n\r";
-            $linesToAdd .= "  */\n\r\n\r";
+            $linesToAdd .= "  */";
 
             if ($this->options['realMode'])
             {
@@ -163,15 +163,24 @@ class PHPFilesDocUpdator
         }
         else
         {
-            /**
-             * @todo Add a phpDoc property.
-             */
-            $processType = 'CREATED';
+            $phpDocItems = array();
+
+            foreach ($file['phpDoc'] as $k => $dData)
+            {
+                $phpDocItems[] = array('key' => $k);
+            }
+
+            $itemInfos    = $phpDocItems[count($phpDocItems) - 1];
+            $lineNumber   = $file['phpDoc'][$itemInfos['key']]['lineNumber'];
+            $originalLine = $file['phpDoc'][$itemInfos['key']]['originalLine'];
+            $lineToAdd    = "  * @$key$spacesBetweenKeyAndValue$value\n\r";
 
             if ($this->options['realMode'])
             {
-
+                $processResult = $this->replaceLines($file['filePath'], array($lineNumber => $originalLine."\n\r".$lineToAdd));
             }
+
+            $processType = 'CREATED';
         }
 
         if (isset($processResult) && $this->options['realMode'])
@@ -192,7 +201,7 @@ class PHPFilesDocUpdator
             $processResult
         );
 
-        $this->files[$file['key']]['phpDoc'][$key]['value'] = $value;
+        $this->files[$file['key']]['phpDoc'] = $this->getParsedLines($file['filePath']);
     }
 
     /**

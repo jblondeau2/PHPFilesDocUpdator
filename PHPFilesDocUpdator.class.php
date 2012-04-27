@@ -55,8 +55,8 @@ class PHPFilesDocUpdator
     public function __construct($pathToParse, array $options = array(), array $filesTypeAssoc = array())
     {
         $defaultOptions = array(
-            'withSubPackages' => false,
             'realMode'        => true,
+            'phpDoc'          => array(),
         );
 
         $this->options         = array_merge($defaultOptions, $options);
@@ -85,35 +85,39 @@ class PHPFilesDocUpdator
                 strtoupper($f['fileType'])
             );
 
-            if (isset($this->options['packageName']) && $this->options['packageName'])
+            foreach ($this->options['phpDoc'] as $k => $v)
             {
-                $this->applyChange($f, 'package', $this->options['packageName']);
-            }
-
-            if (empty($this->options['packageName']))
-            {
-                /**
-                 * Check if file is a plugin/bundle/other one (for example symfony/Symfony projects).
-                 */
-                if (preg_match('/(\w*)(Plugin|Bundle)\//', $f['filePath'], $matches))
+                switch ($k)
                 {
-                    $this->applyChange($f, 'package', $matches[1].$matches[2]);
+                    default:
+                        $this->applyChange($f, $k, $v);
+
+                        break;
+
+                    case 'package':
+                        if (!$v && preg_match('/(\w*)(Plugin|Bundle)\//', $f['filePath'], $matches))
+                        {
+                            $this->applyChange($f, $k, $matches[1].$matches[2]);
+                        }
+                        else
+                        {
+                            $this->applyChange($f, $k, $v);
+                        }
+
+                        break;
+
+                    case 'subpackage':
+                        if (!$v)
+                        {
+                            $this->applyChange($f, $k, $this->getFileTypeFromPath($f['filePath']));
+                        }
+                        else
+                        {
+                            $this->applyChange($f, $k, $v);
+                        }
+
+                        break;
                 }
-            }
-
-            if (isset($this->options['withSubPackages']) && $this->options['withSubPackages'])
-            {
-                $this->applyChange($f, 'subpackage', $this->getFileTypeFromPath($f['filePath']));
-            }
-
-            if (isset($this->options['authorName']) && $this->options['authorName'])
-            {
-                $this->applyChange($f, 'author', $this->options['authorName']);
-            }
-
-            if (isset($this->options['version']) && $this->options['version'])
-            {
-                $this->applyChange($f, 'version', $this->options['version']);
             }
         }
     }

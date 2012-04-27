@@ -138,9 +138,10 @@ class PHPFilesDocUpdator
 
         if (count($file['phpDoc']) == 0)
         {
-            $linesToAdd  = "\n\r";
-            $linesToAdd .= "/**\n\r";
-            $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value\n\r";
+            $linesToAdd  = "\n";
+            $linesToAdd .= "/**\n";
+            $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value";
+            $linesToAdd .= "\n";
             $linesToAdd .= "  */";
 
             if ($this->options['realMode'])
@@ -173,7 +174,7 @@ class PHPFilesDocUpdator
             $itemInfos    = $phpDocItems[count($phpDocItems) - 1];
             $lineNumber   = $file['phpDoc'][$itemInfos['key']]['lineNumber'];
             $originalLine = $file['phpDoc'][$itemInfos['key']]['originalLine'];
-            $lineToAdd    = "  * @$key$spacesBetweenKeyAndValue$value\n\r";
+            $lineToAdd    = "  * @$key$spacesBetweenKeyAndValue$value";
 
             if ($this->options['realMode'])
             {

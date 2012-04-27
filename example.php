@@ -7,11 +7,13 @@ require_once dirname(__FILE__).'/PHPFilesDocUpdator.class.php';
  * Example for a symfony 1.4 project.
  */
 $filesTypeAssoc = array(
-    'model'   => 'Model',
-    'form'    => 'Form',
-    'filter'  => 'Filter',
-    'actions' => 'Action',
-    'na'      => 'Other',
+    'model'     => 'Model',
+    'form'      => 'Form',
+    'filter'    => 'Filter',
+    'actions'   => 'Action',
+    'validator' => 'Validator',
+    'helper'    => 'Helper',
+    'na'        => 'Other',
 );
 
 /**
@@ -21,17 +23,8 @@ $filesTypeAssoc = array(
 $foldersToParse = array(
     array('apps/frontend/lib',      'Frontend'),
     array('apps/frontend/modules',  'Frontend'),
-    array('apps/backend/lib',       'Backend'),
-    array('apps/backend/modules',   'Backend'),
-    array('apps/extranet/lib',      'Extranet'),
-    array('apps/extranet/modules',  'Extranet'),
-    array('plugins/br*Plugin',      null),
-    array('lib/custom',             'Custom'),
-    array('lib/filter',             'Filter'),
-    array('lib/form',               'Form'),
-    array('lib/model',              'Model'),
-    array('lib/widget',             'Widget'),
-    array('lib/task/*.class.php',   'Task'),
+    array('lib',                    'Custom'),
+    array('plugins/myPlugin',       null),
 );
 
 foreach ($foldersToParse as $f)
@@ -64,7 +57,7 @@ foreach ($foldersToParse as $f)
      * -------------------------------------------
      */
     displayLog($phpDocCheater->getParsedFilesLogs(), 'PARSING');
-    displayLog($phpDocCheater->getChangesLogs(), 'CHANGES');
+    displayLog($phpDocCheater->getChangesLogs(),     'CHANGES');
 }
 
 /**

@@ -162,13 +162,13 @@ class PHPFilesDocUpdator
                     $classDescription = sprintf('%s class.', ucfirst($className));
                 }
 
-                $linesToAdd .= "  * $classDescription\n";
-                $linesToAdd .= "  *\n";
+                $linesToAdd .= " * $classDescription\n";
+                $linesToAdd .= " *\n";
             }
 
-            $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value";
+            $linesToAdd .= " * @$key$spacesBetweenKeyAndValue$value";
             $linesToAdd .= "\n";
-            $linesToAdd .= "  */";
+            $linesToAdd .= " */";
 
             if ($this->options['realMode'])
             {
@@ -177,7 +177,7 @@ class PHPFilesDocUpdator
                 $processResult = $this->replaceLines($file['filePath'], array($lineToReplaceNumber => $linesToAdd));
             }
 
-            $processType = '*';
+            $processType = '+';
         }
         elseif (isset($file['phpDoc'][$key]) && $file['phpDoc'][$key])
         {

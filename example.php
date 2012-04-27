@@ -39,18 +39,18 @@ foreach ($foldersToParse as $f)
     /**
      * Options to apply.
      * These informations are to be completed to change them.
-     * 
-     * packageName: new @package name
-     * authorName: new @author name
-     * version: new @version name
+     *
      * realMode: set to 'true' if you want to apply modifications to files
+     * phpDoc: an array with phpDoc options to set
      */
     $options = array(
-        'packageName'    => $f[1],
-        'authorName'     => 'NewAuthorName <author@email.com>',
-        'version'        => '1.23',
-        'withSubmodules' => true,
-        'realMode'       => false,
+        'realMode'       => true,
+        'phpDoc'         => array(
+            'package'    => 'Poney',
+            'subpackage' => null,
+            'version'    => '1.23',
+            'author'     => 'Chuck Norris <chuck@norr.is>',
+        ),
     );
 
     $phpDocCheater = new PHPFilesDocUpdator($f[0], $options, $filesTypeAssoc);

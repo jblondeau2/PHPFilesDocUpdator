@@ -6,7 +6,7 @@
  * @package PHPFilesDocUpdator
  *
  * @author Cédric Dugat <c.dugat@groupe-highco.com>
- * @version 1.0
+ * @version 1.0.1
  */
 class PHPFilesDocUpdator
 {
@@ -287,7 +287,7 @@ class PHPFilesDocUpdator
 
         for ($i = 0; $i <= $limitCount; $i++)
         {
-            $lineToParse = preg_replace(array('/\n/', '/\r/'), array('', ''), $fileFirstLines[$i]);
+            $lineToParse = preg_replace(array('/\n/', '/\r/'), array('', ''), isset($fileFirstLines[$i]) ? $fileFirstLines[$i] : '');
 
             if (isset($lineToParse) && strlen($lineToParse) > 0)
             {

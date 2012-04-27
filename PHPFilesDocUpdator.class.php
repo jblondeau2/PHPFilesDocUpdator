@@ -55,8 +55,9 @@ class PHPFilesDocUpdator
     public function __construct($pathToParse, array $options = array(), array $filesTypeAssoc = array())
     {
         $defaultOptions = array(
-            'realMode'        => true,
-            'phpDoc'          => array(),
+            'realMode'            => true,
+            'generateDescription' => false,
+            'phpDoc'              => array(),
         );
 
         $this->options         = array_merge($defaultOptions, $options);
@@ -144,6 +145,26 @@ class PHPFilesDocUpdator
         {
             $linesToAdd  = "\n";
             $linesToAdd .= "/**\n";
+
+            if ($this->options['generateDescription'])
+            {
+                $className = explode('/', $file['filePath']);
+                $className = explode('.', $className[count($className) - 1]);
+                $className = $className[0];
+
+                if ($file['phpDoc']['package'])
+                {
+                    $classDescription = sprintf('%s\'s %s class.', ucfirst($file['phpDoc']['package']), $className);
+                }
+                else
+                {
+                    $classDescription = sprintf('%s class.', ucfirst($className));
+                }
+
+                $linesToAdd .= "  * $classDescription\n";
+                $linesToAdd .= "  *\n";
+            }
+
             $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value";
             $linesToAdd .= "\n";
             $linesToAdd .= "  */";

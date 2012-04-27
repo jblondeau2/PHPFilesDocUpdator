@@ -41,11 +41,13 @@ foreach ($foldersToParse as $f)
      * These informations are to be completed to change them.
      *
      * realMode: set to 'true' if you want to apply modifications to files
+     * generateDescription: generate class description if phpDoc headers have to be created
      * phpDoc: an array with phpDoc options to set
      */
     $options = array(
-        'realMode'       => true,
-        'phpDoc'         => array(
+        'realMode'            => true,
+        'generateDescription' => true,
+        'phpDoc'              => array(
             'package'    => 'Poney',
             'subpackage' => null,
             'version'    => '1.23',

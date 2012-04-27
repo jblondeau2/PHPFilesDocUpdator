@@ -72,9 +72,10 @@ class PHPFilesDocUpdator
      */
     public function letsGo()
     {
-        foreach ($this->getFilesFromGlob($this->pathToParse.'/*.php') as $filePath)
+        foreach ($this->getFilesFromGlob($this->pathToParse.'/*.php') as $k => $filePath)
         {
             $this->files[] = $this->getFileInformations($filePath);
+            $this->files[$k]['key'] = $k;
         }
 
         foreach ($this->files as $f)
@@ -126,53 +127,72 @@ class PHPFilesDocUpdator
      */
     protected function applyChange(array $file, $key, $value)
     {
-        if ($this->options['realMode'])
+        $file = $this->files[$file['key']];
+
+        if (count($file['phpDoc']) == 0)
         {
-            if (count($file['phpDoc']) == 0)
-            {
-                $spacesBetweenKeyAndValue = '';
+            $spacesBetweenKeyAndValue = '';
 
-                for ($i = strlen($key); $i <= 12; $i++)
-                {
-                    $spacesBetweenKeyAndValue .= ' ';
-                }
-                $commentsLines  = "/**\n\r";
-                $commentsLines .= "  * @$key$spacesBetweenKeyAndValue$value\n\r";
-                $commentsLines .= "  */\n\r\n\r";
-
-                /**
-                 * @todo Insert file first commented lines.
-                 */
-                exit('ADD PHPDOC');
-            }
-            elseif (isset($file['phpDoc'][$key]) && $file['phpDoc'][$key])
+            for ($i = strlen($key); $i <= 12; $i++)
             {
-                $newLine = str_replace($file['phpDoc'][$key]['value'], $value, $file['phpDoc'][$key]['originalLine']);
+                $spacesBetweenKeyAndValue .= ' ';
+            }
 
-                $processResult = $this->replaceLines($file['filePath'], array($file['phpDoc'][$key]['lineNumber'] => $newLine)) ? '[OK]' : '[NOK]';
-            }
-            else
+            $linesToAdd  = "\n\r";
+            $linesToAdd .= "/**\n\r";
+            $linesToAdd .= "  * @$key$spacesBetweenKeyAndValue$value\n\r";
+            $linesToAdd .= "  */\n\r\n\r";
+
+            if ($this->options['realMode'])
             {
-                /**
-                 * @todo Add a phpDoc property.
-                 */
-                exit('ADD PHPDOC');
+                $processResult = $this->replaceLines($file['filePath'], array(2 => $linesToAdd));
             }
+
+            $processType = '*';
+        }
+        elseif (isset($file['phpDoc'][$key]) && $file['phpDoc'][$key])
+        {
+            $newLine = str_replace($file['phpDoc'][$key]['value'], $value, $file['phpDoc'][$key]['originalLine']);
+
+            if ($this->options['realMode'])
+            {
+                $processResult = $this->replaceLines($file['filePath'], array($file['phpDoc'][$key]['lineNumber'] => $newLine));
+            }
+
+            $processType = 'UPDATED';
+        }
+        else
+        {
+            /**
+             * @todo Add a phpDoc property.
+             */
+            $processType = 'CREATED';
+
+            if ($this->options['realMode'])
+            {
+
+            }
+        }
+
+        if (isset($processResult) && $this->options['realMode'])
+        {
+            $processResult = $processResult ? '[OK]' : '[NOK]';
         }
         else
         {
             $processResult = '[NOT-REAL-MODE]';
         }
 
-        $file['phpDoc'][$key]['value'] = $value;
-
-        $this->changesLogs[] = sprintf('[%s] %s / %s -> %s %s',
+        $this->changesLogs[] = sprintf('[%s-%s] %s / %s -> %s %s',
             strtoupper($key),
+            $processType,
             $file['filePath'],
-            $file['phpDoc'][$key]['value'],
+            isset($file['phpDoc'][$key]['value']) ? $file['phpDoc'][$key]['value'] : '---',
             $value,
             $processResult
         );
+
+        $this->files[$file['key']]['phpDoc'][$key]['value'] = $value;
     }
 
     /**

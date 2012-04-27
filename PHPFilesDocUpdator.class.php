@@ -2,52 +2,52 @@
 
 /**
  * PHPFilesDocUpdator class.
- * 
+ *
  * @package PHPFilesDocUpdator
- * 
+ *
  * @author Cédric Dugat <c.dugat@groupe-highco.com>
  * @version 1.0
  */
 class PHPFilesDocUpdator
 {
     /**
-      * @var array $options 
+      * @var array $options
       */
     protected $options;
 
     /**
-      * @var array $filesTypeAssoc 
+      * @var array $filesTypeAssoc
       */
     protected $filesTypeAssoc = array();
 
     /**
-      * @var string $pathToParse 
+      * @var string $pathToParse
       */
     protected $pathToParse;
 
     /**
-      * @var array $files 
+      * @var array $files
       */
     protected $files;
 
     /**
-      * @var array $parsedFilesLogs 
+      * @var array $parsedFilesLogs
       */
     protected $parsedFilesLogs;
 
     /**
-      * @var array $changesLogs 
+      * @var array $changesLogs
       */
     protected $changesLogs;
 
     /**
-      * @var string $phpDocPattern 
+      * @var string $phpDocPattern
       */
     protected $phpDocPattern = '/@([a-z]+)\s+(.*?)\s*(?=$|@[a-z]+\s)/';
 
     /**
      * Constructor.
-     * 
+     *
      * @param string $pathToParse Path to parse
      * @param array  $options Options
      * @param array  $filesTypeAssoc Files type association
@@ -88,7 +88,7 @@ class PHPFilesDocUpdator
             {
                 $this->applyChange($f, 'package', $this->options['packageName']);
             }
-            
+
             if (empty($this->options['packageName']))
             {
                 /**
@@ -119,7 +119,7 @@ class PHPFilesDocUpdator
 
     /**
      * Apply PHP documentation change to a file.
-     * 
+     *
      * @param array  $file Concerned file
      * @param string $key PHPDoc key
      * @param string $value New PHPDoc value
@@ -139,6 +139,8 @@ class PHPFilesDocUpdator
                 $processResult = '[NOT-REAL-MODE]';
             }
 
+            $file['phpDoc'][$key]['value'] = $value;
+
             $this->changesLogs[] = sprintf('[%s] %s / %s -> %s %s',
                 strtoupper($key),
                 $file['filePath'],
@@ -151,9 +153,9 @@ class PHPFilesDocUpdator
 
     /**
      * Get file informations from file path.
-     * 
+     *
      * @param string $filePath
-     * 
+     *
      * @return array
      */
     protected function getFileInformations($filePath)
@@ -170,10 +172,10 @@ class PHPFilesDocUpdator
 
     /**
      * Get files list from pattern, using glob() PHP function like recursive one.
-     * 
+     *
      * @param string $pattern Pattern
      * @param int $flags Flags
-     * 
+     *
      * @return array
      */
     protected function getFilesFromGlob($pattern, $flags = 0)
@@ -190,9 +192,9 @@ class PHPFilesDocUpdator
 
     /**
      * Get file type from complete path.
-     * 
+     *
      * @param string $filePath Complete file path
-     * 
+     *
      * @return string
      */
     protected function getFileTypeFromPath($filePath)
@@ -214,10 +216,10 @@ class PHPFilesDocUpdator
      * Get parsed first lines.
      * From phpDoc comments.
      * Only returns important/completed lines.
-     * 
+     *
      * @param string $filePath File path
      * @param int    $limitCount Lines count limit
-     * 
+     *
      * @return array
      */
     protected function getParsedLines($filePath, $limitCount = 10)
@@ -227,15 +229,26 @@ class PHPFilesDocUpdator
 
         for ($i = 0; $i <= $limitCount; $i++)
         {
-            if (isset($fileFirstLines[$i]) && strlen($fileFirstLines[$i]) > 0)
+            $lineToParse = preg_replace(array('/\n/', '/\r/'), array('', ''), $fileFirstLines[$i]);
+
+            if (isset($lineToParse) && strlen($lineToParse) > 0)
             {
-                preg_match($this->phpDocPattern, $fileFirstLines[$i], $matches);
+                /**
+                 * Only parse first commented lines.
+                 * Stop parsing if PHP code starts.
+                 */
+                if ($lineToParse && !in_array(substr(trim($lineToParse), 0, 1), array('<', '*', '/')))
+                {
+                    break;
+                }
+
+                preg_match($this->phpDocPattern, $lineToParse, $matches);
 
                 if (isset($matches[1]) && isset($matches[2]))
                 {
                     $parsedLines[$matches[1]] = array(
-                        'value'        => preg_replace(array('/\n/', '/\r/'), array('', ''), $matches[2]),
-                        'originalLine' => preg_replace(array('/\n/', '/\r/'), array('', ''), $fileFirstLines[$i]),
+                        'value'        => $matches[2],
+                        'originalLine' => $lineToParse,
                         'lineNumber'   => $i + 1,
                     );
                 }
@@ -247,7 +260,7 @@ class PHPFilesDocUpdator
 
     /**
      * Replace lines.
-     * 
+     *
      * @param string $filePath File path
      * @param array  $newLines New lines to insert
      * @param string $sourceFile Source file

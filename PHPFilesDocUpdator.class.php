@@ -6,7 +6,7 @@
  * @package PHPFilesDocUpdator
  *
  * @author Cédric Dugat <c.dugat@groupe-highco.com>
- * @version 1.0.1
+ * @version 1.0
  */
 class PHPFilesDocUpdator
 {
@@ -73,7 +73,7 @@ class PHPFilesDocUpdator
      */
     public function letsGo()
     {
-        foreach ($this->getFilesFromGlob($this->pathToParse.'/*.php') as $k => $filePath)
+        foreach ($this->getFilesFromGlob($this->pathToParse.'/*.class.php') as $k => $filePath)
         {
             $this->files[] = $this->getFileInformations($filePath);
             $this->files[$k]['key'] = $k;

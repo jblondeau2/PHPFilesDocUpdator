@@ -7,13 +7,8 @@ require_once dirname(__FILE__).'/PHPFilesDocUpdator.class.php';
  * Example for a symfony 1.4 project.
  */
 $filesTypeAssoc = array(
-    'model'     => 'Model',
-    'form'      => 'Form',
-    'filter'    => 'Filter',
-    'actions'   => 'Action',
-    'validator' => 'Validator',
-    'helper'    => 'Helper',
-    'na'        => 'Other',
+    'example' => 'Example',
+    'test'    => 'Test',
 );
 
 /**
@@ -35,5 +30,9 @@ $options = array(
     ),
 );
 
-$phpDocCheater = new PHPFilesDocUpdator($f[0], $options, $filesTypeAssoc);
+/**
+ * Class instance creation.
+ * Change first argument with the path of the folder you want to parse.
+ */
+$phpDocCheater = new PHPFilesDocUpdator('path/folder/to/parse', $options, $filesTypeAssoc);
 $phpDocCheater->letsGo();

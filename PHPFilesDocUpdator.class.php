@@ -354,7 +354,7 @@ class PHPFilesDocUpdator
 
         for ($i = 0; $i <= $limitCount; $i++)
         {
-            if (preg_match('/^class/', trim($fileFirstLines[$i])))
+            if (isset($fileFirstLines[$i]) && preg_match('/^class/', trim($fileFirstLines[$i])))
             {
                 return ($i + 1);
 
